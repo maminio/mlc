@@ -1,0 +1,21 @@
+
+name: "gpt-2-v3"
+language: "python-3.7"
+framework: "pytorch"
+description: "Basic GPT-2 model"
+version: 2.1.0
+model:
+  fileType: ".zip"
+  path: "gpt-2"
+  exec_cmd: ""
+  command: "python run.py"
+  output:
+    type: "stdout"
+  input:
+    type: "flag" # flag
+
+package:
+  type: "conda" # conda | pip
+  requirements_file: "./requirements.txt"
+
+

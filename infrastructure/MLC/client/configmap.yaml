@@ -1,0 +1,18 @@
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: "client-{{ .Values.client.configmap.stage }}"
+#  namespace: {{ .Values.ENV_NAMESPACE | quote }}
+#data:
+#  config.conf: |
+#
+#    HTTPS_PROXY = "https://{{ .Values.STAGING_ENDPOINT_SUBDOMAIN }}api{{ .Values.STAGING_ENDPOINT_STAGE }}.{{ .Values.DOMAIN_NAME }}"
+#
+#    [Namespace]
+#    NAMESPACE = "{{ .Values.ENV_NAMESPACE }}"
+#
+#    [Staging]
+#
+#    STAGING_ENDPOINT_SUBDOMAIN = "{{ .Values.STAGING_ENDPOINT_SUBDOMAIN }}"
+#    STAGING_ENDPOINT_STAGE = "{{ .Values.STAGING_ENDPOINT_STAGE }}"
+#    DOMAIN_NAME = {{ .Values.DOMAIN_NAME }}

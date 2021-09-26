@@ -1,0 +1,14 @@
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#    name: "{{ template "rect-charts.fullname" . }}-{{ .Values.ENV_NAMESPACE }}-console"
+#    "namespace": "istio-system"
+#spec:
+#    hosts:
+#        - "{{ .Values.STAGING_ENDPOINT_SUBDOMAIN }}console{{ .Values.STAGING_ENDPOINT_STAGE }}.{{ .Values.DOMAIN_NAME }}"
+#    gateways:
+#        - ingressgateway
+#    http:
+#        - route:
+#              - destination:
+#                  host: "{{ template "rect-charts.fullname" . }}-client-cluster-ip-service.{{ .Values.ENV_NAMESPACE }}.svc.cluster.local"

@@ -1,0 +1,17 @@
+name: "node-cli"
+language: "python-2.7"
+framework: "tensorflow"
+description: "A very nice project"
+version: 1.1.0
+model:
+  fileType: ".zip"
+  path: "source-code/snow-gan"
+  exec_cmd: ""
+  command: "bash activateEnvAtoB.sh"
+  output:
+    path: "./results/snow-cycle-gan/test_latest/images/image_fake_B.png"
+    type: "png"
+
+package:
+  type: "conda" # conda | pip
+  requirements_file: "./requirements.txt"

@@ -1,0 +1,108 @@
+
+api:
+  name: "api"
+  configmap:
+    stage: ""
+  deployment:
+    namespace: ""
+    image:
+      repository: ""
+      tag: ""
+      pullPolicy: IfNotPresent
+    selector:
+      component: "api"
+    replicas: 1
+  service:
+    protocol: "http"
+    namespace: ""
+    type: "ClusterIP"
+    selector:
+      component: api
+    port: 5000
+
+worker:
+  provisioner:
+    name: "worker-provisioner"
+    kafka_topic: "worker-provisioner-stream"
+    kafka_topic_logstream: "worker-provisioner-logstream"
+    configmap:
+      stage: ""
+    deployment:
+      namespace: ""
+      image:
+        repository: ""
+        tag: ""
+        pullPolicy: IfNotPresent
+      selector:
+        component: "worker-provisioner"
+      replicas: 1
+
+
+secrets:
+  redis:
+    password: ""
+  server:
+    jwt_secret: ""
+
+
+broker:
+  kafkaHost: ""
+  kafkaPort: ""
+  zookeeperHost: ""
+  zookeeperPort: ""
+
+
+docker:
+  registry: ""
+
+
+client:
+  configmap:
+    stage: "dev"
+  deployment:
+    namespace: ""
+    image:
+      repository: ""
+      tag: ""
+      pullPolicy: IfNotPresent
+    selector:
+      component: web
+    ports:
+      containerPort: 3000
+    replicas: 1
+  service:
+    protocol: "https"
+    namespace: ""
+    type: "ClusterIP"
+    selector:
+      component: web
+    ports:
+      containerPort: 3000
+      targetPort: 3000
+
+
+
+mongodb:
+  host: "mongo-mongodb"
+  name: ""
+  password: ""
+  port: "27017"
+  user: ""
+  service:
+    name: ""
+  StatefulSet:
+  clusterIP: "None"
+  labels:
+    name: "mongo"
+  selector:
+    role: "mongo"
+  ports:
+    port: 27017
+    targetPort: 27017
+
+redis:
+  replicas: 1
+  ports:
+    port: 6379
+    targetPort: 6379
+  redis_host: ""

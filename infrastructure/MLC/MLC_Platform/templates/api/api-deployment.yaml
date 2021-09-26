@@ -1,0 +1,36 @@
+"apiVersion": "apps/v1"
+"kind": "Deployment"
+"metadata":
+  "name": "{{ template "mlc-charts.fullname" . }}-{{ .Values.api.name }}"
+  "namespace": {{ .Values.ENV_NAMESPACE | quote }}
+"spec":
+  "replicas": {{ .Values.api.deployment.replicas }}
+  "selector":
+    "matchLabels":
+        "component": {{ .Values.api.deployment.selector.component | quote }}
+  "template":
+    "metadata":
+      "labels":
+        "component": {{ .Values.api.deployment.selector.component | quote }}
+    "spec":
+      "volumes":
+        - name: "configmap"
+          configMap:
+            name: "api-service-{{ .Values.api.configmap.stage }}"
+            items:
+              - key: config.conf
+                path: .env.configmap
+      "containers":
+      - "image": "{{ .Values.docker.registry }}{{ .Values.api.deployment.image.repository }}:{{ .Values.api.deployment.image.tag }}"
+        "env":
+          - "name": "SERVICE_NAME"
+            "value": "{{ .Values.api.name }}"
+          - "name": "SERVICE_PORT"
+            "value": "{{ .Values.api.service.port }}"
+        "imagePullPolicy": {{ .Values.api.deployment.image.pullPolicy | quote }}
+        "name": {{ .Values.api.name | quote }}
+        "volumeMounts":
+          - name: "configmap"
+            mountPath: /app/micro-services/api/configMaps
+        "ports":
+        - "containerPort": {{ .Values.api.service.port }}

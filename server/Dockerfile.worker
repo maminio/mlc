@@ -1,0 +1,51 @@
+FROM gcr.io/kaniko-project/executor:latest
+
+FROM node:alpine
+WORKDIR "/app"
+ENV USER=default
+##Install python
+RUN apk add --no-cache bash vim git openssh openssl curl make build-base python2 sudo && \
+    python2 -m ensurepip && \
+    rm -r /usr/lib/python*/ensurepip && \
+    pip install --upgrade pip setuptools && \
+    if [ ! -e /usr/bin/pip ]; then ln -s pip /usr/bin/pip ; fi && \
+    if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python2 /usr/bin/python; fi && \
+    rm -r /root/.cache
+
+RUN set -ex && apk --no-cache add sudo
+
+RUN adduser -D $USER \
+        && echo "$USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER \
+        && chmod 0440 /etc/sudoers.d/$USER \
+        && chmod 644 /etc/passwd
+
+WORKDIR "/home/default/app"
+COPY ./package.json ./
+COPY ./yarn.lock ./
+RUN yarn install
+COPY . .
+
+################### ENVs ################
+ENV NODE_ENV=${NODE_ENV}
+ENV SERVICE_NAME=${SERVICE_NAME}
+#########################################
+
+
+COPY --from=0 /kaniko /home/default/kaniko
+
+WORKDIR "/home/default/app"
+
+ENV CI_REGISTRY="registry-docker-registry.registry.svc.cluster.local:5000"
+ENV CI_REGISTRY_USER="admin"
+ENV CI_REGISTRY_PASSWORD="admin"
+
+RUN mkdir -p /kaniko/.docker/
+RUN touch /kaniko/.docker/config.json
+
+RUN echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+
+RUN cat /kaniko/.docker/config.json
+RUN chown default:default -R /home/default/app
+USER default
+
+CMD ["npm", "run", "start"]

@@ -1,0 +1,50 @@
+{
+    "presets": [
+        "@babel/preset-env",
+        "@babel/preset-flow",
+        "@babel/preset-react"
+    ],
+    "sourceMaps": true,
+    "retainLines": true,
+    "plugins": [
+        "@babel/plugin-proposal-class-properties",
+        "@babel/plugin-proposal-object-rest-spread",
+        [
+            "module-resolver",
+            {
+                "root": [
+                    "."
+                ],
+                "alias": {
+                    "shared": "./shared",
+                    "server": ".",
+                    "src": "./src",
+                    "flow-typed": "./flow-typed"
+                }
+            }
+        ]
+    ],
+    "ignore": [
+        "node_modules",
+        "dist"
+    ],
+    "env": {
+        "production": {
+            "plugins": [
+                [
+                    "module-resolver",
+                    {
+                        "root": [
+                            "."
+                        ],
+                        "alias": {
+                            "flow-typed": "./flow-typed",
+                            "src": "./src",
+                            "shared": "./shared"
+                        }
+                    }
+                ]
+            ]
+        }
+    }
+}

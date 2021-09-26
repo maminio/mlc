@@ -1,0 +1,148 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "openfaas-gateway"
+spec:
+  host: "gateway.openfaas.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "openfaas-alertmanager"
+spec:
+  host: "alertmanager.openfaas.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "kafka"
+spec:
+  host: "kafka-operator.kafka.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "zookeeper"
+spec:
+  host: "zookeeper.kafka.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "redis"
+spec:
+  host: "redis-master.redis.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "openfaas-nats"
+spec:
+  host: "nats.openfaas.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "openfaas-gateway-external"
+spec:
+  host: "gateway-external.openfaas.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "minio-internal-ds-rule"
+spec:
+  host: "minio.minio.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "registry-mtls"
+spec:
+  host: "registry-docker-registry.registry.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: tls-routing
+spec:
+  hosts:
+    - "registry.local"
+    - "*.registry.local"
+  tls:
+    - match:
+        - sniHosts:
+            - registry.local
+            - "*.registry.local"
+      route:
+        - destination:
+            host: registry-docker-registry.registry.svc.cluster.local
+            port:
+              number: 5000
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: registry-route
+spec:
+  hosts:
+    - registry2.local
+  http:
+    - name: "registry-v1-route"
+      route:
+        - destination:
+            host: registry-docker-registry.registry.svc.cluster.local
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: local-registry
+#  namespace: openfaas
+spec:
+  type: ExternalName
+  externalName: registry-docker-registry.registry.svc.cluster.local
+  ports:
+    - port: 5000

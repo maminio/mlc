@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dockerer
+  labels:
+    app: testing
+spec:
+  containers:
+    - image: "" # INPUT IMAGE NAME
+      name: "docker-container"
+      command: ['bash', '-c', 'echo The app is running! && docker ps && sleep 3600']
+      volumeMounts:
+        - mountPath: /var/run/docker.sock
+          name: docker-socket-volume
+      securityContext:
+        privileged: true
+  volumes:
+    - name: docker-socket-volume
+      hostPath:
+        path: /var/run/docker.sock
+        type: File

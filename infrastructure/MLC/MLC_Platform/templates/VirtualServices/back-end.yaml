@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: "{{ template "mlc-charts.fullname" . }}-{{ .Values.ENV_NAMESPACE }}-server"
+  namespace: istio-system
+spec:
+  hosts:
+    - "{{ .Values.STAGING_ENDPOINT_SUBDOMAIN }}api{{ .Values.STAGING_ENDPOINT_STAGE }}.{{ .Values.DOMAIN_NAME }}"
+  gateways:
+    - "ingressgateway"
+  http:
+    - match:
+        - uri:
+            prefix: "/api/"
+      rewrite:
+        uri: "/"
+      route:
+        - destination:
+            host: "{{ template "mlc-charts.fullname" . }}-{{ .Values.api.name }}.{{ .Values.ENV_NAMESPACE }}.svc.cluster.local"
+    - match:
+        - uri:
+            prefix: "/storage/"
+      rewrite:
+        uri: "/"
+      route:
+        - destination:
+            host: "minio.minio.svc.cluster.local"
+

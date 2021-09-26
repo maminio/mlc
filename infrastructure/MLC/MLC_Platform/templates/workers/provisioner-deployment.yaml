@@ -1,0 +1,39 @@
+"apiVersion": "apps/v1"
+"kind": "Deployment"
+"metadata":
+  "name": "{{ template "mlc-charts.fullname" . }}-{{ .Values.worker.provisioner.name }}"
+  "namespace": {{ .Values.ENV_NAMESPACE | quote }}
+"spec":
+  "replicas": {{ .Values.worker.provisioner.deployment.replicas }}
+  "selector":
+    "matchLabels":
+      "component": {{ .Values.worker.provisioner.deployment.selector.component | quote }}
+  "template":
+    "metadata":
+      "labels":
+        "component": {{ .Values.worker.provisioner.deployment.selector.component | quote }}
+    "spec":
+      "volumes":
+        - name: "configmap"
+          configMap:
+            name: "worker-provisioner-{{ .Values.worker.provisioner.configmap.stage }}"
+            items:
+              - key: config.conf
+                path: .env.configmap
+      "containers":
+        - "image": "{{ .Values.docker.registry }}{{ .Values.worker.provisioner.deployment.image.repository }}:{{ .Values.worker.provisioner.deployment.image.tag }}"
+          resources:
+            requests:
+              memory: "3Gi"
+              cpu: "800m"
+            limits:
+              memory: "4Gi"
+              cpu: "1"
+          "env":
+            - "name": "SERVICE_NAME"
+              "value": "{{ .Values.worker.provisioner.name }}"
+          "imagePullPolicy": {{ .Values.worker.provisioner.deployment.image.pullPolicy | quote }}
+          "name": {{ .Values.worker.provisioner.name | quote }}
+          "volumeMounts":
+            - name: "configmap"
+              mountPath: /app/workers/provisioner/configMaps

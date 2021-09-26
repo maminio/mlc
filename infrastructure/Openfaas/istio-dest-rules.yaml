@@ -1,0 +1,45 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "openfaas-gateway"
+spec:
+  host: "gateway.openfaas.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "openfaas-alertmanager"
+spec:
+  host: "alertmanager.openfaas.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "openfaas-nats"
+spec:
+  host: "nats.openfaas.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "openfaas-gateway-external"
+spec:
+  host: "gateway-external.openfaas.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+
+---

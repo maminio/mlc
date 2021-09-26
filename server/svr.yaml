@@ -1,0 +1,17 @@
+apiVersion: v1                                                                                                                                  [10/21]
+kind: Service
+metadata:
+  name: snow-g-end
+  namespace: default
+spec:
+  ports:
+    - name: http
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+  selector:
+    component: snow-g
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

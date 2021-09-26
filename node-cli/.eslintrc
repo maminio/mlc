@@ -1,0 +1,43 @@
+{
+    "root": true,
+    "parser": "babel-eslint",
+    "extends": [
+        "airbnb-base",
+        "plugin:flowtype/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 8,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "modules": true
+        }
+    },
+    "plugins": [
+        "flowtype",
+        "jest"
+    ],
+    "env": {
+        "node": true,
+        "jasmine": true,
+        "jest": true,
+        "mocha": true
+    },
+    "rules": {
+        "indent": ["error", 4],
+        "max-len": ["error", {
+            "code": 120,
+            "ignoreStrings": true,
+            "ignoreTemplateLiterals": true
+        }],
+        "import/no-commonjs": ["error", 4],
+        "import/no-amd": ["error", 4],
+        "no-underscore-dangle": "off",
+        "import/no-unresolved": [2, { "ignore": ["shared"] }],
+        "import/extensions": [2, { "ignore": ["shared"] }]
+    },
+    "settings": {
+        "import/resolver": {
+            "babel-module": {}
+        }
+    }
+}

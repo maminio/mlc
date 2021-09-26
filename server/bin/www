@@ -1,0 +1,78 @@
+#!/usr/bin/env node
+
+// Modules
+/* eslint-disable import/no-commonjs */
+const dotenvFlow = require('dotenv-flow');
+const fs = require('fs');
+const path = require('path');
+const { find, get } = require('lodash');
+const fse = require('fs-extra')
+
+const microServicesFolderName = 'micro-services';
+const serviceFolders = [
+    {
+        id: 'cron',
+        folder: 'crons',
+    },
+    {
+        id: 'worker',
+        folder: 'workers',
+    },
+];
+
+
+const globalEnvFilter = file => file.includes(process.env.NODE_ENV);
+const serviceEnvFilter = files => files.filter(file => file.includes('.env'));
+const serviceExtractor = (serviceName, element) => get(
+    find(serviceFolders, ({ id, folder }) => folder && serviceName.includes(id)),
+    element,
+    null,
+) || microServicesFolderName;
+
+// cron-gcpas
+const serviceNameExtractor = () => {
+    const t = serviceExtractor(process.env.SERVICE_NAME, 'id');
+    if (serviceFolders.map(({ id }) => id).includes(t)) {
+        return process.env.SERVICE_NAME.replace(`${t}-`, '');
+    }
+    return process.env.SERVICE_NAME;
+};
+// Get ServiceType
+
+const serviceFolder = serviceExtractor(process.env.SERVICE_NAME, 'folder');
+const serviceName = serviceNameExtractor();
+// Load global env files.
+const files = fs.readdirSync(path.resolve(__dirname, `../${serviceFolder}/environments`));
+dotenvFlow.load(globalEnvFilter(files.map(file => path.resolve(__dirname, 'environments', file))));
+
+// Load service env files.
+const serviceFiles = fs.readdirSync(path.resolve(__dirname, `../${serviceFolder}`, serviceName));
+dotenvFlow.load(serviceEnvFilter(serviceFiles.map(file => path.resolve(__dirname, `../${serviceFolder}`, serviceName, file))));
+
+// Load configMaps files.
+const configMapFile = path.resolve(__dirname, `../${serviceFolder}`, serviceName, 'configMaps');
+try {
+    const configMaps = fs.readdirSync(configMapFile);
+    dotenvFlow.load(serviceEnvFilter(configMaps.map(file => path.resolve(__dirname, `../${serviceFolder}`, serviceName, 'configMaps', file))));
+} catch (err) {
+    console.log('ConfigMap not available or in development!');
+}
+console.log('=============', process.env.TELEPRESENCE_MOUNTS);
+// Load telepresence mounted remote files. https://www.telepresence.io/howto/volumes
+if (process.env.TELEPRESENCE_MOUNTS) {
+    const dirs = process.env.TELEPRESENCE_MOUNTS.split(':');
+    dirs.forEach((dir) => {
+        try{
+            const tel_files = fs.readdirSync(path.join(process.env.TELEPRESENCE_ROOT, dir));
+            dotenvFlow.load(tel_files.filter(file => file.includes('.env')).map(file => path.join(process.env.TELEPRESENCE_ROOT, dir, file)));
+        }catch(e){
+            console.log({ e });
+        }
+
+    });
+}
+// Start server
+// eslint-disable-next-line import/no-dynamic-require
+const server = require(path.resolve(__dirname, `../${serviceFolder}`, serviceName, 'server.js')).default;
+
+server(process.env.SERVICE_PORT || 5000);

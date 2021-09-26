@@ -1,0 +1,10 @@
+telepresence.log
+**/node_modules
+**/*Dockerfile
+**/*Dockerfile.*
+**/*.Dockerfile
+**/temp*
+**/README*
+**/*.log
+**/build
+newrelic_agent.log
